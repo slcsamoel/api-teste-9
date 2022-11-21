@@ -30,6 +30,7 @@ class StoreArticleRequest extends FormRequest
             'newsSite' => 'required|max:255',
             'summary' => 'required',
             'publishedAt' => 'required',
+            'featured' => 'required|boolean',
         ];
     }
 }

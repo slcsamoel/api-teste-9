@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Launche extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'article_id', 'provider'
+    ];
+
+    public function article(){
+        return $this->belongsTo(Article::class);
+    }
+
 }

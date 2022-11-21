@@ -15,7 +15,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        return Article::all();
     }
 
     /**
@@ -26,7 +26,11 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-        //
+        if($request->fails()){
+            return response($request->fails(),201);
+        }
+        $article = Article::query()->firstOrCreate($request->all());
+        return response($article,201);
     }
 
     /**
@@ -37,7 +41,7 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
-        //
+        return $article;
     }
 
     /**
@@ -49,7 +53,9 @@ class ArticleController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        //
+
+        return $article->update($request->all()) ? response($article) : response(null,400);
+
     }
 
     /**
@@ -60,6 +66,7 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        //
+        $article->delete();
+        return response(null , 204);
     }
 }

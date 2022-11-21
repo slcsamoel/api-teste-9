@@ -10,4 +10,16 @@ class Article extends Model
 {
     use HasFactory , SoftDeletes;
 
+    protected $fillable = [
+        'title','url','imageUrl','newsSite','summary', 'publishedAt'
+    ];
+
+    public function events(){
+        return $this->hasMany(Event::class);
+    }
+
+    public function launches(){
+        return $this->hasMany(Launche::class);
+    }
+
 }
