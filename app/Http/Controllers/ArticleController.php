@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreArticleRequest;
 use App\Http\Requests\UpdateArticleRequest;
 use App\Models\Article;
+use App\Models\Event;
+use App\Models\Launche;
 
 class ArticleController extends Controller
 {
@@ -28,7 +30,29 @@ class ArticleController extends Controller
     {
 
         $request->validated();
-        $article = Article::query()->firstOrCreate($request->all());
+        $article = Article::query()->firstOrCreate($request->except('launches','events'));
+
+        if(isset($request->launches) && !empty($request->launches)){
+                foreach($request->launches as $lauche){
+                    $laucheModel = new Launche();
+                    $laucheModel->article_id = $article->id;
+                    $laucheModel->provider = $lauche['provider'];
+                    $laucheModel->save();
+                }
+        }
+
+        if(isset($request->events) && !empty($request->events)){
+            foreach($request->events as $event){
+                $eventModel = new Event();
+                $eventModel->article_id = $article->id;
+                $eventModel->provider = $event['provider'];
+                $eventModel->save();
+            }
+        }
+
+        $article->launches = $article->launches();
+        $article->events = $article->events();
+
         return response($article,201);
     }
 

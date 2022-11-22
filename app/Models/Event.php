@@ -13,6 +13,8 @@ class Event extends Model
         'article_id', 'provider'
     ];
 
+    public $timestamps = false;
+
     public function article(){
         return $this->belongsTo(Article::class);
     }
