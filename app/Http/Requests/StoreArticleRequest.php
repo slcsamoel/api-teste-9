@@ -6,6 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreArticleRequest extends FormRequest
 {
+
+    /**
+     * Indicates if the validator should stop on the first rule failure.
+     *
+     * @var bool
+     */
+    protected $stopOnFirstFailure = true;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -31,6 +39,19 @@ class StoreArticleRequest extends FormRequest
             'summary' => 'required',
             'publishedAt' => 'required',
             'featured' => 'required|boolean',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'title.required' => 'A title is required',
+            'url.required' => 'A url is required',
+            'imageUrl.required' => 'A imageUrl is required',
+            'newsSite.required' => 'A newSite is required',
+            'summary.required' => 'A summary is required',
+            'publishedAt.required' => 'A publishedAt is required',
+            'featured.required' => 'A featured is required',
         ];
     }
 }

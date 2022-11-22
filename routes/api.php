@@ -19,4 +19,9 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::get('/', function(){
+
+    return response('Back-end Challenge 2021 🏅 - Space Flight News', 200);
+});
+
 Route::apiResource('articles' , ArticleController::class);

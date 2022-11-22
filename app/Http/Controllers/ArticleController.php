@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateArticleRequest;
 use App\Models\Article;
 use App\Models\Event;
 use App\Models\Launche;
+use PhpParser\Node\Stmt\TryCatch;
 
 class ArticleController extends Controller
 {
@@ -17,7 +18,8 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return Article::with('launches' , 'events')->get();
+        $articles = Article::with('launches' , 'events');
+        return $articles->paginate(20);
     }
 
     /**
@@ -28,32 +30,39 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
+        try {
+            $request->validated();
+            $data = $request->safe()->only(['title', 'url', 'imageUrl', 'newsSite' , 'summary' , 'featured']);
+            $publishedAt = new \DateTime();
+            $data['publishedAt'] = $publishedAt->date;
+            $article = Article::firstOrCreate($data);
 
-        $request->validated();
-        $article = Article::query()->firstOrCreate($request->except('launches','events'));
-
-        if(isset($request->launches) && !empty($request->launches)){
-                foreach($request->launches as $lauche){
-                    $laucheModel = new Launche();
-                    $laucheModel->article_id = $article->id;
-                    $laucheModel->provider = $lauche['provider'];
-                    $laucheModel->save();
-                }
-        }
-
-        if(isset($request->events) && !empty($request->events)){
-            foreach($request->events as $event){
-                $eventModel = new Event();
-                $eventModel->article_id = $article->id;
-                $eventModel->provider = $event['provider'];
-                $eventModel->save();
+            if(isset($request->launches) && !empty($request->launches)){
+                    foreach($request->launches as $lauche){
+                        $laucheModel = new Launche();
+                        $laucheModel->article_id = $article->id;
+                        $laucheModel->provider = $lauche['provider'];
+                        $laucheModel->save();
+                    }
             }
+
+            if(isset($request->events) && !empty($request->events)){
+                foreach($request->events as $event){
+                    $eventModel = new Event();
+                    $eventModel->article_id = $article->id;
+                    $eventModel->provider = $event['provider'];
+                    $eventModel->save();
+                }
+            }
+
+            $article->launches = $article->launches();
+            $article->events = $article->events();
+
+            return response($article,201);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage() , 500);
         }
-
-        $article->launches = $article->launches();
-        $article->events = $article->events();
-
-        return response($article,201);
     }
 
     /**
@@ -64,10 +73,17 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
-        $article->featured = $article->featured == 0 ? false : true ;
-        $article->launches = $article->launches();
-        $article->events = $article->events();
-        return $article;
+        try {
+            $article->featured = $article->featured == 0 ? false : true ;
+            $article->launches = $article->launches();
+            $article->events = $article->events();
+            return response($article,201);
+
+        } catch (\Throwable $th) {
+
+            return response($th->getMessage() , 500);
+
+        }
     }
 
     /**
@@ -79,10 +95,12 @@ class ArticleController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
+        $update = $article->update($request->all());
+
         $article->featured = $article->featured == 0 ? false : true ;
         $article->launches = $article->launches();
         $article->events = $article->events();
-        return $article->update($request->all()) ? response($article) : response(null,400);
+        return $update ? response($article , 200) : response(null,400);
 
     }
 

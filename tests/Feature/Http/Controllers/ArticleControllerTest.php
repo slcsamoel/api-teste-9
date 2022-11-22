@@ -16,7 +16,7 @@ class ArticleControllerTest extends TestCase
      */
     public function test_index()
     {
-        $response = $this->get('/api/article');
+        $response = $this->get('/api/articles');
         $response->assertStatus(200);
     }
 
@@ -51,7 +51,7 @@ class ArticleControllerTest extends TestCase
         $article->title = fake()->name();
         $article->featured = fake()->boolean();
         $article->url = fake()->url();
-        $response = $this->put("/api/articles/$article->id",$article->toArray());
+        $response = $this->put("/api/articles/$article->id", $article->toArray());
         $response->assertStatus(200);
 
     }
