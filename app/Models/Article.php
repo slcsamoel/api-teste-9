@@ -11,7 +11,7 @@ class Article extends Model
     use HasFactory , SoftDeletes;
 
     protected $fillable = [
-        'title','url','imageUrl','newsSite','summary', 'publishedAt'
+        'title','url','imageUrl','newsSite','summary', 'publishedAt' , 'featured'
     ];
 
     public function events(){

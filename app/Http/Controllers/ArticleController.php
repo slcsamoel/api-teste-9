@@ -15,7 +15,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return Article::all();
+        return Article::with('launches' , 'events')->get();
     }
 
     /**
@@ -26,9 +26,8 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-        if($request->fails()){
-            return response($request->fails(),201);
-        }
+
+        $request->validated();
         $article = Article::query()->firstOrCreate($request->all());
         return response($article,201);
     }
@@ -41,6 +40,9 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
+        $article->featured = $article->featured == 0 ? false : true ;
+        $article->launches = $article->launches();
+        $article->events = $article->events();
         return $article;
     }
 
@@ -53,7 +55,9 @@ class ArticleController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-
+        $article->featured = $article->featured == 0 ? false : true ;
+        $article->launches = $article->launches();
+        $article->events = $article->events();
         return $article->update($request->all()) ? response($article) : response(null,400);
 
     }
